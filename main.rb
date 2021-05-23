@@ -13,86 +13,93 @@ def convert (number)
   ranks=['thir','four','fif']
 
   #Label
-  labels=['hundred','thiusand','milliom','billion']
+  labels=['','hundred','thiusand','milliom','billion']
 
   #dividers
   dividers=[10,100,1000,1_000_000,1_000_000_000]
 
-  #indicate if we must show digits or not
-  showDigit=true
-
   #Main loop to handle conversions
-  #i=dividers.length-1
-  i=0
-  until i==-1 or number/10 == 0
+  i=dividers.length-1
+  #initialise an empty result
+  result=""
+  until i==-1
+
+    #indicate if we must show digits or not
+    showDigit=true
+
     #dizens
     j = number / dividers[i]
     number %= dividers[i]
 
-    #Prevent showing zero next to a round number
-    #eg: show twenty instead of twenty zero
-    if number == 0
-      showDigit=false
-    end
+    unless j == 0
 
-    #handle number from 10 to 19
-    if j == 1
+      #Prevent showing zero next to a round number
+      #eg: show twenty instead of twenty zero
       if number == 0
-        puts "ten"
-      elsif number == 1
-        puts "eleven"
-      elsif number == 2
-        puts "twelve"
-      else
-        #handle 13 and 15
-        if [3,5].include?(number)
-          print "#{ranks[number-3]}"
-          #handle 14,16 to 19
+        showDigit=false
+      end
+
+      #handle number from 10 to 19
+      if j == 1
+        if number == 0
+          result += "ten"
+        elsif number == 1
+          result += "eleven"
+        elsif number == 2
+          result += "twelve"
         else
-          print "#{digits[number]}"
+          #handle 13 and 15
+          if [3,5].include?(number)
+            result += "#{ranks[number-3]}"
+            #handle 14,16 to 19
+          else
+            result += "#{digits[number]}"
+          end
+
+          #Show the appropriate suffixe
+          #Prevent dubbing 't'
+          unless number == 8
+            result += "t"
+          end
+          result += "een"
         end
 
-        #Show the appropriate suffixe
-        #Prevent dubbing 't'
-        unless number == 8
-          print "t"
-        end
-        puts "een"
-      end
+        #prevent showing digits
+        #eg: show eleven instead of eleven one
+        showDigit=false
 
-      #prevent showing digits
-      #eg: show eleven instead of eleven one
-      showDigit=false
-
-    #handle 20 to 90
-    else
-      #handle 20
-      if j == 2
-        print "twen"
-
-      #handle 30,40,50
-      elsif [3,4,5].include?(j)
-      print "#{ranks[j-3]}"
-
-      #handle 60 to 90
+      #handle 20 to 90
       else
-        print digits[j]
-      end
+        #handle 20
+        if j == 2
+          result += "twen"
 
-      #show the right suffix
-      #Prevent dubbing 't'
-      unless j == 8
-        print "t"
+        #handle 30,40,50
+        elsif [3,4,5].include?(j)
+        result += "#{ranks[j-3]}"
+
+        #handle 60 to 90
+        else
+          result += digits[j].to_s
+        end
+
+        #show the right suffix
+        #Prevent dubbing 't'
+        unless j == 8
+          result += "t"
+        end
+        result += "y "
       end
-      print "y "
+      result += " #{labels[i]}"
     end
-    i-=1
+    i -=1
   end
 
   #Digit part
-  if showDigit
-    puts digits[number]
+  if showDigit and number <10
+    result += digits[number].to_s
   end
+  puts result
 end
 
 #Get the user input
