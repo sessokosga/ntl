@@ -2,113 +2,112 @@
 #	Number To Letters	#
 #-----------------------#
 
-#Converting function
-def convert (number)
-  #Initialise arrays
+#Show digits
+def show_digits (num)
   #digits one to tem
-  digits=['zero','one','two','three','four','five',
-    'six','seven','eight','nine']
+  digits = %w[zero one two three four five six seven eight nine]
+  digits[num]
+end
+
+#Handle number between 10 and 99
+def almost_hundred (num)
+  #Initialise an empty result
+  result = ""
 
   #Rank
-  ranks=['thir','four','fif']
+  ranks = %w[twen thir four fif]
+
+  #Non standard numbers
+  nonstand = %w[eleven twelve]
+
+  i = num / 10
+  num %= 10
+
+  if i == 1
+    if num == 0
+      result += "ten"
+    elsif [1, 2].include?(num)
+      result += nonstand[num - 1].to_s
+    else
+      if [3, 4, 5].include?(num)
+        result += ranks[num - 2].to_s
+      else
+        result += show_digits num
+      end
+      result += 'teen'
+    end
+  else
+    if [2, 3, 4, 5].include?(i)
+      result += ranks[i - 2].to_s
+    else
+      result += show_digits i
+    end
+    result += 'ty'
+  end
+
+  result += ' '
+end
+
+#Handle conversion from 1 to 999
+def almost_thousand (num)
+  #Initialise an empty result
+  result = ""
+  until num < 0
+    #Handle hundreds
+    if num > 99
+      result += show_digits num / 100
+      result += ' hundred '
+      num %= 100
+      #Handle dozens and numbers form 11 to 19
+    elsif num >= 10
+      result += almost_hundred num
+
+      #Prevent showing eleven one to nineteen nine
+      if num > 10 && num < 20
+        num = 0
+      end
+      num %= 10
+
+      #Handle digits
+    elsif num < 10
+      unless num == 0
+        result += show_digits num
+      end
+      num -= 10
+    end
+  end
+  return result
+end
+
+#Main conversion function
+def convert (num)
+  #Initialise an empty result
+  result = ""
 
   #Label
-  labels=['','hundred','thiusand','milliom','billion']
+  labels = %w[thousand million billion trillion quadrillion]
 
   #dividers
-  dividers=[10,100,1000,1_000_000,1_000_000_000]
+  dividers = [1000, 1_000_000, 1_000_000_000, 1_000_000_000_000, 1_000_000_000_000_000]
 
-  #Main loop to handle conversions
-  i=dividers.length-1
-  #initialise an empty result
-  result=""
-  until i==-1
+  #This loop identify the right label
+  i = dividers.length - 1
+  while i >= 0
+    j = num / dividers[i]
 
-    #indicate if we must show digits or not
-    showDigit=true
-
-    #dizens
-    j = number / dividers[i]
-    number %= dividers[i]
-
-    unless j == 0
-
-      #Prevent showing zero next to a round number
-      #eg: show twenty instead of twenty zero
-      if number == 0
-        showDigit=false
+    #Prevent showing 0 million
+    unless j ==0
+      result += almost_thousand j
+      result += ' ' + labels[i] + ' '
       end
-
-      #handle number from 10 to 19
-      if j == 1
-        if number == 0
-          result += "ten"
-        elsif number == 1
-          result += "eleven"
-        elsif number == 2
-          result += "twelve"
-        else
-          #handle 13 and 15
-          if [3,5].include?(number)
-            result += "#{ranks[number-3]}"
-            #handle 14,16 to 19
-          else
-            result += "#{digits[number]}"
-          end
-
-          #Show the appropriate suffixe
-          #Prevent dubbing 't'
-          unless number == 8
-            result += "t"
-          end
-          result += "een"
-        end
-
-        #prevent showing digits
-        #eg: show eleven instead of eleven one
-        showDigit=false
-
-      #handle 20 to 90
-      else
-        #handle 20
-        if j == 2
-          result += "twen"
-
-        #handle 30,40,50
-        elsif [3,4,5].include?(j)
-        result += "#{ranks[j-3]}"
-
-        #handle 60 to 90
-        else
-          result += digits[j].to_s
-        end
-
-        #show the right suffix
-        #Prevent dubbing 't'
-        unless j == 8
-          result += "t"
-        end
-        result += "y "
-      end
-      result += " #{labels[i]}"
-    end
-    i -=1
+    num %= dividers[i]
+    i -= 1
   end
 
-  #Digit part
-  if showDigit and number <10
-    result += digits[number].to_s
-  end
-  puts result
+  result+= ' ' +almost_thousand( num)
+
+  return result
+
 end
 
-#Get the user input
-#print "Enter the number : "
-#number = gets.to_i
-
-
-i=0
-until i==100
-  puts convert(i)
-  i+=1
-end
+puts convert 1_124_101_000_456
