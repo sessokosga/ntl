@@ -110,4 +110,12 @@ def convert (num)
 
 end
 
-puts convert 1_124_101_000_456
+puts "*"*25
+puts "*   Number to Letter    *"
+puts "*"*25
+
+print "Enter a number : "
+num = gets.to_i
+
+
+puts convert num
